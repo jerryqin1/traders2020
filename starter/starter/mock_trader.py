@@ -1,5 +1,6 @@
 # Place any imports you need here!
 # Helpful packages may include pandas, numpy, or sklearn.
+import sklearn
 import numpy as np
 
 class Trader:
@@ -27,6 +28,7 @@ class Trader:
 
         # TODO: ADD ANY ADDITIONAL INFO YOU WANT
 
+
     def WonAuctions(self, wins):
         """
         Our grader will call this function once, after PlaceBid,
@@ -35,6 +37,7 @@ class Trader:
             wins: dict[sym -> bool] telling you if you won.
         """
         self.won_auctions = wins
+
     
     def BuyInfo(self, time, stock_prices, fund_prices):
         """
@@ -69,11 +72,43 @@ class Trader:
             dict[symbol -> float] of your positions. Positive is buy/long
                 and negative is sell/ short.
         """
-        trades = {}
+        # Initialize the short and long windows
+        trades = {"A":0, "B":0, "C":0, "D":0}
 
-        #TODO: PICK HOW TO MAKE TRADES.
-        for sym in stock_prices:
-            trades[sym] = 0
+        short_window = 8
+        long_window = 100
+
+        long_ma_c = 256.908
+        short_ma_c = 284.756
+
+        long_ma_d = 136.1594
+        short_ma_d = 135.69
+
+
+        price_c, price_d = stock_prices["C"], stock_prices["D"]
+
+        long_ma_c -= long_ma_c/long_window
+        long_ma_c += price_c/long_window
+
+        short_ma_c -= short_ma_c/short_window
+        short_ma_c += price_c/short_window
+
+        long_ma_d -= long_ma_d/long_window
+        long_ma_d += price_d/long_window
+
+        short_ma_d -= short_ma_d/short_window
+        short_ma_d += price_d/short_window
+
+
+        if short_ma_c > long_ma_c:
+            trades["C"] = 500000
+        elif short_ma_c < long_ma_c: 
+            trades["C"] = -500000
+
+        if short_ma_d > long_ma_d:
+            trades["D"] = 500000
+        elif short_ma_d < long_ma_d: 
+            trades["D"] = -500000
 
         # Be sure you don't trade more than self.POS_LIMIT_BY_SYMBOL of each.
         for sym in trades:
@@ -88,7 +123,3 @@ class Trader:
                 trades[sym] = trades[sym] * multiplier
 
         return trades
-
-
-
-
